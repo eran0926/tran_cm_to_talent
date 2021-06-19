@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            text-align: center;
+            font-size: 30px;
+            font-family: DFKai-sb;
+        }
+
+        .flexdiv {
+            display: flex;
+            height: auto;
+            align-items: center;
+        }
+
+        button {
+            text-align: center;
+            font-size: 30px;
+            font-family: DFKai-sb;
+        }
+
+        .in {
+            text-align: center;
+            font-size: 30px;
+            font-family: DFKai-sb;
+        }
+
+        .inlab {
+            text-align: center;
+            font-size: 30px;
+            font-family: DFKai-sb;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <title>才數計算器</title>
+</head>
+
+<body>
+    <h1 align="center">才數計算器</h1>
+    <hr noshade size="5" color=#0A0A0A>
+    <div class="flex_div">
+        <div id="input_div" class="inner_div">
+            <form method="POST" action="javascript:send(in_s)">
+
+                <div id="main_form">
+
+                    <p align="center">
+                        <label for="g1l" class="inlab">玻璃1長度</label>
+                        <input class="in" id="g1l" name="g1l" value="" step="any" type="number" required>
+                    </p>
+
+                    <p align="center">
+                        <label for="g1w" class="inlab">玻璃1寬度</label>
+                        <input class="in" id="g1w" name="g1w" value="" step="any" type="number" required>
+                    </p>
+
+                    <p align="center">
+                        <label for="g1n" class="inlab">玻璃1數量</label>
+                        <input class="in" id="g1n" name="g1n" value="1" step="1" type="number" required>
+                    </p>
+
+                </div>
+
+                <p align="center">
+                    <input class="new_in" id="new_in" name="new_in" type="button" value="新增欄位">
+                    <input class="del_in" id="del_in" name="del_in" type="button" value="刪除欄位">
+                </p>
+
+                <p align="center"><input class="sb" id="submit" name="submit" type="submit" value="確認"></p>
+            </form>
+        </div>
+
+        <div id="show_div" class="inner_div">
+
+        </div>
+    </div>
+    <script>
+
+        document.getElementById("input_div").style.display = ""; //顯示 input div
+        document.getElementById("show_div").style.display = "none"; //隱藏 show div
+
+        var in_s = 1
+
+
+        function get_html(in_s) {
+            var html = '\
+            <p align="center">\
+                <label for="g1l">玻璃1長度</label>\
+                <input class="in" id="g1l" name="g1l" value="" step="any" type="number" required>\
+            </p>\
+\
+            <p align="center">\
+                <label for="g1w">玻璃1寬度</label>\
+                <input class="in" id="g1w" name="g1w" value="" step="any" type="number" required>\
+            </p>\
+\
+            <p align="center">\
+                <label for="g1n">玻璃1數量</label>\
+                <input class="in" id="g1n" name="g1n" value="1" step="1" type="number" required>\
+            </p>\
+            ';
+
+            var re = html.replace(/(g)(\d+)([lwn])/g, "$1" + in_s.toString() + "$3");
+            var re = re.replace(/(玻璃)(\d+)(..)/g, "$1" + in_s.toString() + "$3");
+
+            return re
+        }
+        function get_result(a_glass) {
+            // a_glass[l,w,n]
+            var talents = []
+            var t = 0
+            a_glass.forEach(function (glass) {
+
+                t = glass[0] * glass[1] / 900 * glass[2]
+                talents.push(parseFloat(t))
+
+            });
+
+            var d_list = []
+
+            d_list.push(["玻璃編號", "玻璃片數", "玻璃長度", "玻璃寬度", "玻璃總長度", "玻璃總寬度", "玻璃總才數"])
+
+            var a = [0, 0, 0, 0, 0, 0]
+            for (index = 0; index < a_glass.length; index++) {
+                d_list.push(["玻璃" + (index + 1).toString(), (a_glass[index][2]).toFixed(1) + "片", a_glass[index][0].toFixed(1) + "公分", a_glass[index][1].toFixed(1) + "公分", (a_glass[index][0] * a_glass[index][2]).toFixed(1) + "公分", (a_glass[index][1] * a_glass[index][2]).toFixed(1) + "公分", talents[index].toFixed(1) + "才"])
+                a[0] = a[0] + a_glass[index][0]
+                a[1] = a[1] + a_glass[index][1]
+                a[2] = a[2] + a_glass[index][0] * a_glass[index][2]
+                a[3] = a[3] + a_glass[index][1] * a_glass[index][2]
+                a[4] = a[4] + talents[index]
+                a[5] = a[5] + a_glass[index][2]
+
+
+            }
+
+            d_list.push(["合計", a[5].toFixed(1) + "片", a[0].toFixed(1) + "公分", a[1].toFixed(1) + "公分", a[2].toFixed(1) + "公分", a[3].toFixed(1) + "公分", a[4].toFixed(1) + "才"])
+
+            var result_html
+            var result_table = list_to_html(d_list);
+            result_html = result_table + '<input class="retutn_btu" id="retutn_btu" name="retutn_btu" type="button" onclick="javascript:window.location.reload()" value="回上一頁">'
+            return result_html
+
+        }
+        function list_to_html(rlist) {
+            var indent = "    "
+            var start_indent = 1
+            var it = start_indent
+            var now_indent = "\n" + indent.repeat(it)
+            var html = ""
+            html = html + now_indent + '<table style="width:100%" border="1">'
+            it = it + 1
+            now_indent = "\n" + indent.repeat(it)
+            head = rlist.shift()
+            html = html + now_indent + '<tr>'
+            it = it + 1
+            now_indent = "\n" + indent.repeat(it)
+            head.forEach(function (th) {
+                html = html + now_indent + '<th>' + th.toString() + '</th>'
+
+            });
+
+            it = it - 1
+            now_indent = "\n" + indent.repeat(it)
+            html = html + now_indent + '</tr>'
+            rlist.forEach(function (line) {
+                html = html + now_indent + '<tr>'
+                it = it + 1
+                now_indent = "\n" + indent.repeat(it)
+                line.forEach(function (th) {
+                    html = html + now_indent + '<td>' + th.toString() + '</td>'
+                });
+                it = it - 1
+                now_indent = "\n" + indent.repeat(it)
+                html = html + now_indent + '</tr>'
+            });
+            it = it - 1
+            now_indent = "\n" + indent.repeat(it)
+            html = html + now_indent + '</table>'
+
+            return html
+        }
+
+        function send(in_s) {
+
+            var data = [];
+
+            for (i = 1; i <= in_s; i++) {
+                l = parseFloat(document.getElementById("g" + i.toString() + "l").value)
+                w = parseFloat(document.getElementById("g" + i.toString() + "w").value)
+                n = parseFloat(document.getElementById("g" + i.toString() + "n").value)
+
+                data.push([l, w, n]);
+
+
+            };
+
+            var result_html = get_result(data);
+            document.getElementById("show_div").innerHTML = result_html;
+
+            document.getElementById("input_div").style.display = "none"; //隱藏 input div
+            document.getElementById("show_div").style.display = ""; //顯示 show div
+
+
+        };
+
+
+        document.getElementById('new_in').onclick = function () {
+            in_s = in_s + 1;
+
+            var ori_html = document.getElementById("main_form").innerHTML;
+
+            var re_html = get_html(in_s);
+
+            var out_html = ori_html + re_html;
+
+            document.getElementById("main_form").innerHTML = out_html;
+        };
+
+        document.getElementById('del_in').onclick = function () {
+
+            if (in_s > 1) {
+                var ori_html = document.getElementById("main_form").innerHTML;
+
+                var need_del_html_len = get_html(in_s).length;
+
+
+                var out_html = ori_html.substring(0, ori_html.length - need_del_html_len)
+
+                in_s = in_s - 1;
+
+                document.getElementById("main_form").innerHTML = out_html;
+            };
+        };
+
+    </script>
+
+</body>
+
+</html>
