@@ -118,7 +118,7 @@
             var t = 0
             a_glass.forEach(function (glass) {
 
-                t = glass[0] * glass[1] / 900 * glass[2]
+                t = Math.ceil(glass[0] * glass[1] / 900) * glass[2]
                 talents.push(parseFloat(Math.ceil(t)))
 
             });
